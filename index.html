@@ -3,142 +3,139 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chatbot Demo</title>
+  <title>Gasthof Geyer – Chat</title>
   <style>
     :root{
-      --navy:#0b1f3f; --navy2:#163a6b; --bg:#ffffff; --text:#0b1f3f;
-      --radius:16px; --shadow:0 12px 30px rgba(2,6,23,.18);
+      --green:#243524; --bordeaux:#5C2E2E; --gold:#C9A34E; --off:#FAF7F2;
+      --radius:14px; --shadow:0 12px 28px rgba(0,0,0,.25);
     }
     *{box-sizing:border-box} html,body{height:100%}
+
     body{
-      margin:0; background:#fff; color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      /* LOKALE DATEI IM SELBEN ORDNER */
+      background: url('./background.jpg') center/cover no-repeat fixed;
       display:flex; align-items:center; justify-content:center;
+      color:var(--off);
     }
+
     .chat{
-      width:min(100%, 420px); height:min(100vh, 700px);
-      border:1px solid #e5e7eb; border-radius:var(--radius);
-      box-shadow:var(--shadow); background:var(--bg);
-      display:flex; flex-direction:column; overflow:hidden;
+      width:min(95%,420px);
+      height:min(95vh,700px);
+      border-radius:var(--radius);
+      background:rgba(36,53,36,0.85);
+      box-shadow:var(--shadow);
+      display:flex; flex-direction:column;
+      backdrop-filter:blur(8px);
+      overflow:hidden;
+      border:1px solid rgba(201,163,78,.4);
     }
     .chat__header{
-      padding:14px 16px; color:#fff;
-      background:linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
-      display:flex; align-items:center; gap:10px; justify-content:space-between;
+      padding:14px 16px;
+      background:linear-gradient(90deg,rgba(36,53,36,0.95),rgba(92,46,46,0.95));
+      border-bottom:1px solid rgba(201,163,78,.3);
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-family:"Playfair Display",serif; font-size:1.2rem; font-weight:600;
+      color:var(--gold); text-shadow:0 1px 0 rgba(0,0,0,.4);
     }
-    .chat__title{font-weight:600}
-    .chat__msgs{
-      flex:1; padding:14px; overflow:auto; background:#f9fafb;
-    }
-    .row{margin:10px 0; display:flex}
+    .chat__msgs{flex:1; padding:16px; overflow:auto; background:rgba(250,247,242,.08);}
+    .row{margin:10px 0; display:flex;}
     .row .bubble{
-      max-width:85%; padding:10px 12px; border-radius:12px; line-height:1.45;
-      box-shadow:0 1px 2px rgba(0,0,0,.05); white-space:pre-wrap; word-break:break-word;
-      background:#fff; border:1px solid #e5e7eb; color:#0f172a;
+      max-width:85%; padding:10px 14px; border-radius:var(--radius);
+      line-height:1.45; white-space:pre-wrap; word-break:break-word;
+      box-shadow:0 1px 2px rgba(0,0,0,.25); border:1px solid transparent;
+    }
+    .row.bot .bubble{
+      background:linear-gradient(180deg,#2b432d,var(--green));
+      border-color:rgba(201,163,78,.35); color:var(--gold);
     }
     .row.user{justify-content:flex-end}
-    .row.user .bubble{background:var(--navy); color:#fff; border:0}
-    .chat__form{display:flex; border-top:1px solid #eef2f7}
-    .chat__input{flex:1; border:0; padding:12px; font-size:15px; outline:none}
-    .chat__send{
-      border:0; padding:0 16px; background:var(--navy); color:#fff; font-weight:600; cursor:pointer;
-    }
-    .typing{display:inline-flex; gap:4px; align-items:center}
-    .typing span{width:6px; height:6px; background:#9ca3af; border-radius:50%; animation:blink 1s infinite}
+    .row.user .bubble{background:linear-gradient(180deg,#6a3434,var(--bordeaux)); color:var(--off);}
+    .chat__form{display:flex; border-top:1px solid rgba(201,163,78,.3); background:rgba(36,53,36,0.85);}
+    .chat__input{flex:1; border:0; padding:12px; font-size:15px; background:transparent; color:var(--off); outline:none}
+    .chat__input::placeholder{color:rgba(250,247,242,.6)}
+    .chat__send{border:0; padding:0 18px; background:var(--gold); color:#2b210f; font-weight:600; cursor:pointer; border-radius:0 var(--radius) var(--radius) 0; transition:filter .2s}
+    .chat__send:hover{filter:brightness(1.1)}
+    .typing{display:inline-flex; gap:5px; align-items:center}
+    .typing span{width:6px; height:6px; background:var(--gold); border-radius:50%; animation:blink 1s infinite}
     .typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
-    @keyframes blink{0%,80%,100%{opacity:.2} 40%{opacity:1}}
+    @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+    .chat__msgs{scrollbar-width:thin; scrollbar-color:var(--gold) rgba(36,53,36,.3)}
+    .chat__msgs::-webkit-scrollbar{width:8px} .chat__msgs::-webkit-scrollbar-thumb{background:var(--gold); border-radius:4px}
   </style>
 </head>
 <body>
-  <main class="chat" role="application" aria-label="Chatbot">
-    <header class="chat__header">
-      <div class="chat__title">Chatbot Demo</div>
-    </header>
+  <main class="chat" role="application" aria-label="Gasthof Geyer Chatbot">
+    <header class="chat__header">Gasthof Geyer Assistent</header>
     <section class="chat__msgs" id="msgs" aria-live="polite"></section>
     <form class="chat__form" id="form" autocomplete="off">
-      <input class="chat__input" id="input" type="text" placeholder="Nachricht eingeben …" />
+      <input class="chat__input" id="input" type="text" placeholder="Fragen Sie nach Tisch, Menü oder Wein …" />
       <button class="chat__send" id="send" type="submit">Senden</button>
     </form>
   </main>
 
   <script>
-    // ===== Einstellungen =====
-    const N8N_URL = "https://magnus3773.app.n8n.cloud/webhook/9decfc03-7c51-435f-984e-93973e6fec7d/chat";
-    const TITLE   = "Chatbot Demo";
-    const GREETING= "Hallo! Wie kann ich Ihnen helfen?";
+    const N8N_URL="https://magnus3773.app.n8n.cloud/webhook/9decfc03-7c51-435f-984e-93973e6fec7d/chat";
+    const GREETING="Grüß Gott im Gasthof Geyer! Wobei darf ich behilflich sein – Reservierung, Speisekarte oder Weinempfehlung?";
+    const SKEY="aiChatSessionId_geyer";
+    let sessionId=localStorage.getItem(SKEY);
+    if(!sessionId){sessionId=Math.random().toString(36).slice(2);localStorage.setItem(SKEY,sessionId);}
+    const msgs=document.getElementById("msgs");
+    const form=document.getElementById("form");
+    const input=document.getElementById("input");
 
-    // ===== Session-ID (für Verlauf auf n8n-Seite) =====
-    const SKEY = "aiChatSessionId_fullpage";
-    let sessionId = localStorage.getItem(SKEY);
-    if(!sessionId){ sessionId = Math.random().toString(36).slice(2); localStorage.setItem(SKEY, sessionId); }
-
-    // ===== DOM =====
-    document.querySelector(".chat__title").textContent = TITLE;
-    const msgs = document.getElementById("msgs");
-    const form = document.getElementById("form");
-    const input = document.getElementById("input");
-
-    // ===== Helpers =====
-    function addRow(role, text){
-      const row = document.createElement("div");
-      row.className = "row " + role;
-      const b = document.createElement("div");
-      b.className = "bubble";
-      b.textContent = text;
+    function addRow(role,text){
+      const row=document.createElement("div");
+      row.className="row "+role;
+      const b=document.createElement("div");
+      b.className="bubble";
+      b.textContent=text;
       row.appendChild(b);
       msgs.appendChild(row);
-      msgs.scrollTop = msgs.scrollHeight;
+      msgs.scrollTop=msgs.scrollHeight;
       return row;
     }
     function addTyping(){
-      const row = document.createElement("div");
-      row.className = "row bot";
-      const b = document.createElement("div");
-      b.className = "bubble";
-      b.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
+      const row=document.createElement("div");
+      row.className="row bot";
+      const b=document.createElement("div");
+      b.className="bubble";
+      b.innerHTML='<span class="typing"><span></span><span></span><span></span></span>';
       row.appendChild(b);
       msgs.appendChild(row);
-      msgs.scrollTop = msgs.scrollHeight;
+      msgs.scrollTop=msgs.scrollHeight;
       return row;
     }
+    addRow("bot",GREETING);
 
-    // Begrüßung einmalig
-    addRow("bot", GREETING);
-
-    // Senden
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e)=>{
       e.preventDefault();
-      const text = (input.value || "").trim();
+      const text=(input.value||"").trim();
       if(!text) return;
-
-      addRow("user", text);
-      input.value = "";
-
-      const typing = addTyping();
-
+      addRow("user",text);
+      input.value="";
+      const typing=addTyping();
       try{
-        const res = await fetch(N8N_URL, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({
-            action: "sendMessage",
+        const res=await fetch(N8N_URL,{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            action:"sendMessage",
             sessionId,
-            route: "chat",
-            chatInput: text,
-            metadata: { source: "fullpage" }
+            route:"chat",
+            chatInput:text,
+            metadata:{source:"gasthof-geyer"}
           })
         });
-
-        if(!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json().catch(() => ({}));
-
-        const reply = data.reply || data.message || data.output || "Okay.";
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const data=await res.json().catch(()=>({}));
+        const reply=data.reply||data.message||data.output||"Sehr wohl.";
         typing.remove();
-        addRow("bot", reply);
-
-      } catch(err){
+        addRow("bot",reply);
+      }catch(err){
         typing.remove();
-        addRow("bot", "Netzwerkfehler – bitte später erneut versuchen.");
+        addRow("bot","Netzwerkfehler – bitte später erneut versuchen.");
       }
     });
   </script>
